@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_testavimas" default="compile.module.testavimas">
+  <dirname property="module.testavimas.basedir" file="${ant.file.module_testavimas}"/>
+  
+  <property name="module.jdk.home.testavimas" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.testavimas" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.testavimas" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.testavimas" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="testavimas.output.dir" value="${module.testavimas.basedir}/out/production/testavimas"/>
+  <property name="testavimas.testoutput.dir" value="${module.testavimas.basedir}/out/test/testavimas"/>
+  
+  <path id="testavimas.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="testavimas.module.production.classpath">
+    <path refid="${module.jdk.classpath.testavimas}"/>
+  </path>
+  
+  <path id="testavimas.runtime.production.module.classpath">
+    <pathelement location="${testavimas.output.dir}"/>
+  </path>
+  
+  <path id="testavimas.module.classpath">
+    <path refid="${module.jdk.classpath.testavimas}"/>
+    <pathelement location="${testavimas.output.dir}"/>
+  </path>
+  
+  <path id="testavimas.runtime.module.classpath">
+    <pathelement location="${testavimas.testoutput.dir}"/>
+    <pathelement location="${testavimas.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.testavimas">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.testavimas">
+    <patternset refid="excluded.from.module.testavimas"/>
+  </patternset>
+  
+  <path id="testavimas.module.sourcepath">
+    <dirset dir="${module.testavimas.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.testavimas" depends="compile.module.testavimas.production,compile.module.testavimas.tests" description="Compile module testavimas"/>
+  
+  <target name="compile.module.testavimas.production" depends="register.custom.compilers" description="Compile module testavimas; production classes">
+    <mkdir dir="${testavimas.output.dir}"/>
+    <javac2 destdir="${testavimas.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.testavimas}/javac">
+      <compilerarg line="${compiler.args.testavimas}"/>
+      <bootclasspath refid="testavimas.module.bootclasspath"/>
+      <classpath refid="testavimas.module.production.classpath"/>
+      <src refid="testavimas.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.testavimas"/>
+    </javac2>
+    
+    <copy todir="${testavimas.output.dir}">
+      <fileset dir="${module.testavimas.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.testavimas.tests" depends="register.custom.compilers,compile.module.testavimas.production" description="compile module testavimas; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.testavimas" description="cleanup module">
+    <delete dir="${testavimas.output.dir}"/>
+    <delete dir="${testavimas.testoutput.dir}"/>
+  </target>
+</project>
