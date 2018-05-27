@@ -1,5 +1,6 @@
 package com.company.generator;
 
 public enum GeneratorType{
-    RANDOM
+    RANDOM,
+    BRANCHING
 }

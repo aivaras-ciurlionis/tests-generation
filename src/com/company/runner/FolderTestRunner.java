@@ -24,6 +24,9 @@ public class FolderTestRunner {
     }
 
     FolderRunResult runTestsInFolder(int folderNumber, String folderLocation){
+//        if(!folderLocation.contains("_fft")){
+//            return new FolderRunResult();
+//        }
         System.out.println(folderLocation);
         String[] innerDirectories = getDirectories(folderLocation);
         String method = getTestMethod(folderLocation);

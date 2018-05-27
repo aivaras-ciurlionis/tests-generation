@@ -1,7 +1,10 @@
 package com.company.generator;
 
+import com.company.coverage.Coverage;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -24,11 +27,11 @@ public class TestFileGenerator {
         }
     }
 
-    private void createTempFolder() {
-        File file = new File(tempFolder);
+    public static void createTempFolder(String tempF) {
+        File file = new File(tempF);
         if (file.exists()) {
             try {
-                Files.walk(Paths.get(tempFolder))
+                Files.walk(Paths.get(tempF))
                         .map(Path::toFile)
                         .sorted((o1, o2) -> -o1.compareTo(o2))
                         .forEach(File::delete);
@@ -36,7 +39,7 @@ public class TestFileGenerator {
                 System.out.println(e);
             }
         }
-        new File(tempFolder).mkdirs();
+        new File(tempF).mkdirs();
     }
 
     private String getHeader() {
@@ -93,8 +96,18 @@ public class TestFileGenerator {
 
     public void GenerateTestFile(String testFileName, String method, InputArguments[] arguments) {
         Path filePath = Paths.get(testFileName, "FFT.java");
-        createTempFolder();
-        String testFileContent = readFile(filePath.toString(), Charset.defaultCharset());
+        Path tempPath = Paths.get(tempFolder, "FFT_coverage.java");
+
+        createTempFolder(tempFolder);
+
+        try {
+            PrintStream o = new PrintStream(new File(tempPath.toString()));
+            Coverage.rewrite(filePath.toString(), o);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        String testFileContent = readFile(tempPath.toString(), Charset.defaultCharset());
         testFileContent = testFileContent.replace("public class FFT", "class FFT");
         String tempFileContent = getHeader() + testFileContent + getTestClass(method, arguments);
         saveFile(tempFileContent);
