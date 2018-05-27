@@ -1,6 +1,7 @@
 package com.company.runner;
 
 import com.company.commandLine.JavaRunner;
+import com.company.coverage.CoverageExtractor;
 import com.company.generator.*;
 
 import java.nio.file.Paths;
@@ -16,6 +17,7 @@ public class SingleTestRunner {
         OriginalClassExecutor executor = new OriginalClassExecutor();
         ResultComparer comparer = new ResultComparer();
         SingleSpecResult specResult = new SingleSpecResult();
+        CoverageExtractor extractor = new CoverageExtractor();
         int repeatCount = 0;
         boolean differ = false;
         String reason = "";
@@ -26,14 +28,17 @@ public class SingleTestRunner {
                     inputCount,
                     method,
                     Paths.get(testFolderPath, "FFT.java").toString());
+            double coverage = 0;
 
             for(SpecInput input : suite.inputs) {
                 InputArguments[] generatedInputs = input.items;
                 System.out.println(input.items[0].arguments.length);
                 fileGenerator.GenerateTestFile(testFolderPath, method, generatedInputs);
                 String result = runner.runJavaFile("temp", "temp");
+                String parsedResult = extractor.getOutputWithoutCoverageInfo(result);
+                coverage = extractor.extractCoveragePercentage(method, result);
                 String expectedResult = executor.executeOriginal(method, generatedInputs);
-                reason = comparer.compareResults(result,expectedResult);
+                reason = comparer.compareResults(parsedResult,expectedResult);
                 differ = !reason.equals("");
                 if(differ) break;
             }
@@ -41,6 +46,7 @@ public class SingleTestRunner {
             specResult.success = differ;
             specResult.retries = repeatCount;
             specResult.reason = reason;
+            specResult.coverage = coverage;
         }
         return specResult;
     }
@@ -84,6 +90,7 @@ public class SingleTestRunner {
         runResult.number = testNumber;
         runResult.count = result.retries;
         runResult.success = result.success;
+        runResult.coverage = result.coverage;
         runResult.reason = result.reason;
         return runResult;
     }

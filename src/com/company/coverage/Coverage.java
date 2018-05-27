@@ -65,7 +65,7 @@ public class Coverage {
                                     ff = 1;
                                     fft = 15;
                                     linenum = 0;
-                                    currentMethod = first;
+                                    currentMethod = "fft";
                                 }
                                 else if (strLine.indexOf(second) >= 0)
                                 {
@@ -73,7 +73,7 @@ public class Coverage {
                                     ff = 1;
                                     fft = 6;
                                     linenum = 0;
-                                    currentMethod = second;
+                                    currentMethod = "ifft";
                                 }
                                 else if (strLine.indexOf(thirt) >= 0)
                                 {
@@ -81,7 +81,7 @@ public class Coverage {
                                     ff = 1;
                                     fft = 7;
                                     linenum = 0;
-                                    currentMethod = thirt;
+                                    currentMethod = "cconvolve";
                                 }
                                 else if (strLine.indexOf(fore) >= 0)
                                 {
@@ -89,7 +89,7 @@ public class Coverage {
                                     ff = 1;
                                     fft = 8;
                                     linenum = 0;
-                                    currentMethod = fore;
+                                    currentMethod = "convolve";
                                 }
                                 else
                                 {
